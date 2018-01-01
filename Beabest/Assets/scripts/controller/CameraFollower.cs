@@ -24,6 +24,12 @@ namespace CameraController
         private float _targetSpeed;
         [SerializeField]
         private float _followSpeed = 9;
+        [SerializeField] 
+        private float _collisionFixingSpeed = 19;
+        [SerializeField] 
+        private float defZ;
+
+        private float currentZ;
 
         [SerializeField]
         private float _turnSmoothing = .1f;
@@ -41,19 +47,28 @@ namespace CameraController
         private float _tiltAngle;
         
         private Vector3 _targetPosition;
+
+        private Vector3 _defaultCameraPosition;
+        
+        [SerializeField]
+        private LayerMask _ignoreLayers;
         
         private void Start()
         {
             _camTransform = Camera.main.transform;
+            _defaultCameraPosition = _camTransform.position;
             _pivot = _camTransform.parent;
+            _ignoreLayers = ~(1 << 8);
+            currentZ = defZ;
         }
 
-        public void UpdateCamera(float detla)
+        public void UpdateCamera(float delta)
         {
             GatherInputs();
             SelectSpeed();
-            FollowTarget(detla);
+            FollowTarget(delta);
             HandleRotation();
+            HandlePivotPosition(delta);
         }
 
         private void GatherInputs()
@@ -76,12 +91,82 @@ namespace CameraController
                 _targetSpeed = _mouseSpeed;
         }
 
-        private void FollowTarget(float Delta)
-        {
-            _targetPosition = Vector3.Lerp(transform.position, Target.position, Delta * _followSpeed);
+        private void FollowTarget(float delta)
+        {     
+            _targetPosition = Vector3.Lerp(transform.position, Target.position, delta * _followSpeed);   
             transform.position = _targetPosition;
         }
 
+        private void HandlePivotPosition(float delta)
+        {
+            float targetZ = defZ;
+            CameraCollion(defZ, ref targetZ);
+
+            currentZ = Mathf.Lerp(currentZ, targetZ, delta * _collisionFixingSpeed);
+            Vector3 tp = Vector3.zero;
+
+            tp.z = currentZ;
+            _camTransform.localPosition = tp;
+        }
+
+        private void CameraCollion(float targetZ, ref float actualZ)
+        {
+            float step = Mathf.Abs(targetZ);
+            int stepCount = 2;
+
+            float stepIncrement = step / stepCount;
+
+            RaycastHit hit;
+
+            Vector3 origin = _pivot.position;
+
+            Vector3 direction = -_pivot.forward;
+
+            if (Physics.Raycast(origin, direction, out hit, step, _ignoreLayers))
+            {
+                float distance = Vector3.Distance(hit.point, origin);
+                actualZ = -(distance / 2);
+            }
+            else
+            {
+                for (int i = 0; i < stepCount +1 ; i++)
+                {
+                    for (int j = 0; j < 4; j++)
+                    {
+                        Vector3 dir = Vector3.zero;
+                        Vector3 secondOrigin = origin + (direction * i * stepIncrement);
+                        switch (i)
+                        {                          
+                            case 0:
+                                dir = _camTransform.right;
+                                break;
+                            case 1:
+                                dir = -_camTransform.right;
+                                break;
+                                 
+                            case 2:
+                                dir = _camTransform.up;
+                                break;
+                                 
+                            case 3:
+                                dir = -_camTransform.up;
+                                break;                            
+                        }
+
+                        if (Physics.Raycast(secondOrigin, dir, out hit, 0.2f, _ignoreLayers))
+                        {
+                            float distance = Vector3.Distance(secondOrigin, origin);
+                            actualZ = -(distance / 2);
+                            if (actualZ < 0.2f)
+                                actualZ = 0;
+                            
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        
         private void HandleRotation()
         {
             if (_turnSmoothing > 0)

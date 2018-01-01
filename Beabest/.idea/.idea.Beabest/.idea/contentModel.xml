@@ -198,13 +198,10 @@
           </e>
         </e>
         <e p="Scripts" t="Include">
-          <e p="CameraManager.cs" t="Include" />
           <e p="controller" t="Include">
             <e p="CameraFollower.cs" t="Include" />
             <e p="CharacterController.cs" t="Include" />
           </e>
-          <e p="InputHandler.cs" t="Include" />
-          <e p="StateManager.cs" t="Include" />
           <e p="Utils" t="Include">
             <e p="Helper.cs" t="Include" />
           </e>

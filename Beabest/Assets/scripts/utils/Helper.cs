@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SA
+namespace CharacterController
 {
     public class Helper : MonoBehaviour
     {
@@ -24,9 +24,7 @@ namespace SA
         {
             anim = GetComponent<Animator>();
         }
-    
-        
-        //hacky as fuck
+       
         private void Update()
         {
             enableRootMotion = !anim.GetBool("canMove");

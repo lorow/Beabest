@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using SA;
 
 namespace Controller
 {
@@ -16,6 +15,8 @@ namespace Controller
         private float _vertical;
         [SerializeField]
         private float _horizontal;
+        [SerializeField]
+        private bool _jumpInput;
         [SerializeField]
         private float _moveAmout;
         [SerializeField]
@@ -52,14 +53,8 @@ namespace Controller
         private Vector3 _v;
         private Vector3 _h;
 
-        private void Start()
-        {
-            Debug.Log("pierdol się");
-        }
-
         private void Awake()
         {
-            Debug.Log("pierdol się2");
             _cameraFollower.Target = this.transform;
             SetupAnimator();
             SetupRigidbody();
@@ -72,11 +67,11 @@ namespace Controller
         {
             _onGround = OnGround();
             _anim.SetBool("onGround", _onGround);
+            GetInput();
         }
 
         private void FixedUpdate()
         {
-            GetInput();
             UpdateStates();
             HandleMovement(); 
            _cameraFollower.UpdateCamera(Time.fixedDeltaTime);
@@ -95,7 +90,8 @@ namespace Controller
 
             if (_onGround)
                 _rigid.velocity = _moveDirection * (_targetSpeed * _moveAmout);
-                
+
+
             if (!_lockOn)
             {
                 _targetDir = _moveDirection;
@@ -154,6 +150,7 @@ namespace Controller
             _vertical = Input.GetAxis("Vertical");
             _horizontal = Input.GetAxis("Horizontal");
             _runInput = Input.GetButton("RunInput");
+            _jumpInput = Input.GetButton("JumpInput");
         }
         
         private bool OnGround()

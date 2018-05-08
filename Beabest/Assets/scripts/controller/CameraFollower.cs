@@ -81,6 +81,7 @@ namespace CameraController
 
         private void SelectSpeed()
         {
+            //detects if the player is using mouse or controller
             if (_cH != 0 || _cH != 0)
             {
                 _h = _cH;
@@ -103,7 +104,7 @@ namespace CameraController
             CameraCollion(defZ, ref targetZ);
 
             currentZ = Mathf.Lerp(currentZ, targetZ, delta * _collisionFixingSpeed);
-            Vector3 tp = Vector3.zero;
+            Vector3 tp = new Vector3(0, 1.89f, 0);
 
             tp.z = currentZ;
             _camTransform.localPosition = tp;
@@ -140,6 +141,7 @@ namespace CameraController
                             case 0:
                                 dir = _camTransform.right;
                                 break;
+
                             case 1:
                                 dir = -_camTransform.right;
                                 break;

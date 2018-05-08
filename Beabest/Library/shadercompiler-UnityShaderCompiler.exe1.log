@@ -1,6 +1,9 @@
 Base path: H:/Unity2017.3/Editor/Data
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  api=4 insize=1435 outsize=585 ok=1
+  api=4 insize=1435 outsize=569 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=3273 outsize=2253 ok=1
+  api=4 insize=3273 outsize=577 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=1526 outsize=341 ok=1
+Cmd: initializeCompiler
